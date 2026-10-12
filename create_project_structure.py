@@ -45,7 +45,7 @@ files = [
     "app/services/__init__.py",
     "app/services/retrieval/__init__.py",
     "app/services/retrieval/embedding.py",
-    "app/services/retrieval/qdrant_service.py",
+    "app/services/retrieval/pinecone_service.py",
     "app/services/retrieval/ranking_service.py",
     # Root
     "app/__init__.py",
@@ -55,7 +55,7 @@ files = [
     "run.py",
     ".env",
     ".gitignore",
-    "app/data/.gitkeep",
+    "app/data/",
     "app/logger.py"
 ]
 

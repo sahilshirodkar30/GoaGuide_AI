@@ -1,0 +1,34 @@
+
+Here’s a build order that lets you test each layer before stacking the next one on top. The rule: build from the bottom up (things with no dependencies first), and always have something runnable at each step.
+
+Phase 1: Foundation (no dependencies)
+.env and requirements.txt: API keys and pinned packages. Note that your config.py has a mismatch: LOGFIRE_TOKEN is uppercase while everything else is lowercase. Pydantic-settings is case-insensitive by default so it works, but make it logfire_token for consistency.
+app/config.py: you’ve already done this.
+app/logger.py: set up Logfire/logging once, and every later file imports it. Having logging early makes debugging all the other steps much easier.
+
+
+Phase 2: Data layer (Pinecone)
+services/retrieval/embedding.py: function to embed text via Pinecone’s llama-text-embed-v2. Test it with one sentence.
+services/retrieval/qdrant_service.py: you’re using Pinecone, not Qdrant, so rename this to pinecone_service.py. Add functions for create-index, upsert, and query. Test with dummy vectors.
+services/retrieval/ranking_service.py: reranking with bge-reranker-v2-m3. Test with a query plus a few sample documents.
+Phase 3: Ingestion (fill the database)
+ingestion/loaders/: start with text.py and markdown.py (simplest), then pdf.py, html.py, office.py.
+ingestion/chunking/splitter.py: split loaded text into chunks with metadata (source, page, title).
+ingestion/processor.py: pipeline of load → chunk → embed → upsert.
+Run ingestion on your Goa data in app/data/. Now you have a populated index, which is the milestone that matters most. Verify by querying Pinecone directly and checking the results make sense.
+Phase 4: LLM gateway
+gateway/client.py: a single wrapper for DeepSeek (with Groq as fallback, per your config). DeepSeek is OpenAI-compatible, so the openai SDK with base_url works. Test with a simple “hello” call.
+Phase 5: Agent (LangGraph)
+agents/state.py: define the state schema (query, plan, retrieved docs, answer, etc.).
+agents/nodes/retriever.py: calls embed → Pinecone query → rerank. Add the web-search fallback (Tavily) when the rerank score is below web_fallback_score.
+agents/nodes/responder.py: builds a prompt from retrieved context and calls the gateway.
+agents/nodes/planner.py: add this last. A simple retrieve → respond graph works without it, and it’s the most “optional” node.
+agents/graph.py: wire the nodes together. Start with retriever → responder, and add the planner after that works end to end.
+Phase 6: Guardrails
+guardrails/colang_rules.py and rails.py: add NeMo Guardrails after the core pipeline works. Debugging guardrails and RAG at the same time is painful, since you can’t tell which layer broke. Start with simple input rails (off-topic, jailbreak) and an output rail.
+Phase 7: API and UI
+main.py: FastAPI with a /chat endpoint and API-key auth (using app_api_key and admin_api_key).
+run.py: uvicorn entry point.
+ui/: Streamlit or Gradio frontend, last.
+Phase 8: Evals
+evals/: build a small set of 20-30 Goa questions with expected answers. Ideally start collecting these in Phase 3, but at the latest build them before tuning anything.

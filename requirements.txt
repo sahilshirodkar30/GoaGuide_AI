@@ -1,9 +1,11 @@
+
+# API
 fastapi==0.116.1
 uvicorn[standard]==0.35.0
-jinja2==3.1.6
 python-multipart==0.0.20
 pydantic-settings==2.10.1
 
+# LangChain and agents
 langgraph==1.1.10
 langchain-core==1.6.1
 langchain-community==0.4.2
@@ -11,20 +13,27 @@ langchain-openai==1.6.0
 langchain-tavily==0.2.18
 langchain-pinecone==0.2.13
 langchain-text-splitters==1.1.2
+langchain-groq
 
-pinecone==7.3.0
+# LLM and vector database
 openai==3.3.1
+pinecone==7.3.0
 
+# Document loaders
 pypdf==6.16.2
 python-docx==1.2.0
-python-dotenv==1.1.1
-langchain_groq
-streamlit
-logfire
 python-pptx==1.0.2
-
-pypdf==6.11.0
 beautifulsoup4==4.14.3
-
-unstructured[pdf,docx,pptx,xlsx,md]
 pdfplumber
+unstructured[pdf,docx,pptx,xlsx,md]
+
+# Configuration and observability
+python-dotenv==1.1.1
+logfire
+
+# UI
+streamlit
+
+portkey-ai==2.3.0
+FlashRank==0.2.10
+redis==7.4.0

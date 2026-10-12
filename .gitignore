@@ -228,3 +228,4 @@ pyproject.toml
 uv.lock
 run.py
 processed_data
+rest.txt
