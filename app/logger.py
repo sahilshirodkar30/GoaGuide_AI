@@ -13,10 +13,8 @@ def setup_logging(app=None) -> None:
 
     if not _configured:
         logfire.configure(
-            service_name="GoaGuide_AI",
-            token=settings.LOGFIRE_TOKEN or None,
-            send_to_logfire="if-token-present",
-            environment=settings.logfire_environment,
+            service_name="goaguide",
+            token=settings.LOGFIRE_TOKEN
         )
 
         logfire.instrument_openai()

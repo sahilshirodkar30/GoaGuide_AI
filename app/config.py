@@ -41,9 +41,10 @@ class Settings(BaseSettings):
     admin_api_key: str = "change-me"
 
     # --- LLM GATEWAY (PORTKEY) ---
-    PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
-    GROQ_SLUG =  "rag1"     # primary: @rag/llama-3.3-70b-versatile
-    GROQ_SLUG_2 = "rag2"
+    PORTKEY_API_KEY :str= os.getenv("PORTKEY_API_KEY")
+    GROQ_SLUG :str=  "rag1"     # primary: @rag/llama-3.3-70b-versatile
+    GROQ_SLUG_2:str = "rag2"
+    PORTKEY_PRIMARY_CONFIG_ID:str=os.getenv("portkey_primary_config_id")
 
 
 @lru_cache

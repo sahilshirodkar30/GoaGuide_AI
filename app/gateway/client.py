@@ -1,62 +1,67 @@
-from app.logger import log
-from portkey_ai import Portkey,createHeaders,PORTKEY_GATEWAY_URL
 from langchain_openai import ChatOpenAI
+from openai import AsyncOpenAI, OpenAI
+from portkey_ai import PORTKEY_GATEWAY_URL, createHeaders
+
 from app.config import settings
 
-GATEWAY_CONFIG = {
-    "strategy": {"mode": "fallback"},
-    "cache": {"mode": "simple"},
-    "retry": {
-        "attempts": 2,
-        "on_status_codes": [429, 503]
-    },
-    "targets": [
-        {"override_params": {"model": f"@{settings.GROQ_SLUG}/deepseek-chat"}},
-        {"override_params": {"model": f"@{settings.GROQ_SLUG_2}/llama-3.1-70b-versatile"}},
-    ]
-}
+# Routing (fallback / retry / cache) lives in a Portkey saved config, because
+# inline configs are blocked on this workspace. We pass its slug (pc-...)
+# via the `config` argument, which becomes the x-portkey-config header.
 
-portkey_client = Portkey(
+
+def _make_headers(feature: str = "rag") -> dict:
+    """Build Portkey headers referencing the saved config by slug."""
+    if not settings.PORTKEY_PRIMARY_CONFIG_ID:
+        raise ValueError(
+            "PORTKEY_PRIMARY_CONFIG_ID is not set in .env. "
+            "Get the pc-... slug from the Portkey dashboard."
+        )
+    return createHeaders(
+        api_key=settings.PORTKEY_API_KEY,
+        config=settings.PORTKEY_PRIMARY_CONFIG_ID,  # was config_id (wrong)
+        metadata={
+            "feature": feature,
+            "_user": "rag-system",
+            "environment": "production",
+        },
+    )
+
+
+portkey_client = OpenAI(
     api_key=settings.PORTKEY_API_KEY,
-    config=GATEWAY_CONFIG
+    base_url=PORTKEY_GATEWAY_URL,
+    default_headers=_make_headers(),
 )
 
-def get_langchain_llm(feature: str = "rag") -> ChatOpenAI:
-    """
-    Returns a Portkey-backed ChatOpenAI — a drop-in for ChatGroq in LangChain nodes.
 
-    Why ChatOpenAI and not ChatGroq:
-      Portkey is a proxy. It exposes an OpenAI-compatible endpoint at PORTKEY_GATEWAY_URL.
-      ChatGroq is hardwired to Groq's API and does not support routing through a proxy.
-      ChatOpenAI supports base_url (points at Portkey) and default_headers (passes Portkey
-      auth + config). The @rag/model-name format is Portkey-specific — Groq's own client
-      does not understand it. You are still using Groq models; Portkey is just in the middle.
-    """
+def get_langchain_llm(feature: str = "rag") -> ChatOpenAI:
+    """Portkey-backed ChatOpenAI for LangChain nodes."""
     return ChatOpenAI(
         api_key=settings.PORTKEY_API_KEY,
         base_url=PORTKEY_GATEWAY_URL,
-        model=f"@{settings.GROQ_SLUG}/deepseek-chat",
-        temperature=0,
-        default_headers=createHeaders(
-            api_key=settings.PORTKEY_API_KEY,
-            config=GATEWAY_CONFIG,
-            metadata={
-                "feature": feature,
-                "_user": "rag-system",
-                "environment": "production"
-            }
-        )
+        model=f"@{settings.GROQ_SLUG}/gpt-5-mini",
+        default_headers=_make_headers(feature),
     )
 
-def extract_cache_status(response) -> str:
+
+def get_async_openai_client(feature: str = "rag") -> AsyncOpenAI:
+    """Async OpenAI client routed through Portkey."""
+    return AsyncOpenAI(
+        api_key=settings.PORTKEY_API_KEY,
+        base_url=PORTKEY_GATEWAY_URL,
+        default_headers=_make_headers(feature),
+    )
+
+
+def extract_cache_status(raw_response) -> str:
     """
-    Pull x-portkey-cache-status from the Portkey native client response headers.
-    Tries multiple attribute paths defensively — returns 'MISS' if not found.
+    Read x-portkey-cache-status from a raw response obtained via
+    `client.chat.completions.with_raw_response.create(...)`.
+    Returns 'MISS' if the header is absent.
     """
-    for attr in ("_raw_response", "_response", "_http_response"):
-        raw = getattr(response, attr, None)
-        if raw is not None:
-            status = getattr(raw, "headers", {}).get("x-portkey-cache-status", "")
-            if status:
-                return status.upper()
+    headers = getattr(raw_response, "headers", None)
+    if headers is not None:
+        status = headers.get("x-portkey-cache-status", "")
+        if status:
+            return status.upper()
     return "MISS"

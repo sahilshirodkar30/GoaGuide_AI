@@ -1,6 +1,6 @@
 
 # API
-fastapi==0.116.1
+fastapi>=0.121
 uvicorn[standard]==0.35.0
 python-multipart==0.0.20
 pydantic-settings==2.10.1
@@ -37,3 +37,6 @@ streamlit
 portkey-ai==2.3.0
 FlashRank==0.2.10
 redis==7.4.0
+
+nemoguardrails==0.21.0
+dataclasses-json
