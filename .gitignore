@@ -223,7 +223,6 @@ __marimo__/
 .env
 app/data
 
-main.py
 
 run.py
 processed_data
