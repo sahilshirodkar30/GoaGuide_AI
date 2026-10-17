@@ -40,3 +40,4 @@ redis==7.4.0
 
 nemoguardrails==0.21.0
 dataclasses-json
+tavily

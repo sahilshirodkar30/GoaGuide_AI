@@ -227,12 +227,12 @@ with main_col:
                             st.write(src)
 
     # Suggestions only while the chat is fresh
-    if len(st.session_state.messages) == 1:
-        cols = st.columns(2)
-        for i, ex in enumerate(EXAMPLES):
-            if cols[i % 2].button(ex, key=f"ex_{i}", width="stretch"):
-                st.session_state.pending = ex
-                st.rerun()
+    
+    cols = st.columns(2)
+    for i, ex in enumerate(EXAMPLES):
+        if cols[i % 2].button(ex, key=f"ex_{i}", width="stretch"):
+            st.session_state.pending = ex
+            st.rerun()
 
 with trace_col:
     if st.session_state.trace:
