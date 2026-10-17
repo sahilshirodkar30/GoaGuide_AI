@@ -222,10 +222,9 @@ __marimo__/
 
 .env
 app/data
-.python-version
+
 main.py
-pyproject.toml
-uv.lock
+
 run.py
 processed_data
 rest.txt
