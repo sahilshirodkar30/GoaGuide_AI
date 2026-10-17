@@ -40,7 +40,7 @@ jobs:
           PINECONE_API_KEY: test-pinecone-key
           PORTKEY_API_KEY: test-portkey-key
           PORTKEY_PRIMARY_CONFIG_ID: pc-test-config
-          APP_API_KEY: test-app-key
-          ADMIN_API_KEY: test-admin-key
+          APP_API_KEY: change-me
+          ADMIN_API_KEY: change-me
           LOGFIRE_TOKEN: ""
           TAVILY_API_KEY: ""
