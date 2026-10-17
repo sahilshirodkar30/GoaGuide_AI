@@ -31,9 +31,16 @@ jobs:
         run: uv sync --frozen
 
       - name: Run tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-          # Supply safe test-only values if configuration requires them.
-          # Replace names with the variables actually used by your app.
-          GROQ_API_KEY: test-key
         run: uv run pytest tests -v
+        env:
+          PYTHONPATH: .
+          LLM_PROVIDER: deepseek
+          DEEPSEEK_API_KEY: test-deepseek-key
+          GROQ_API_KEY: test-groq-key
+          PINECONE_API_KEY: test-pinecone-key
+          PORTKEY_API_KEY: test-portkey-key
+          PORTKEY_PRIMARY_CONFIG_ID: pc-test-config
+          APP_API_KEY: test-app-key
+          ADMIN_API_KEY: test-admin-key
+          LOGFIRE_TOKEN: ""
+          TAVILY_API_KEY: ""
