@@ -9,16 +9,21 @@ def generate_node(state: AgentState):
     Uses the native Portkey client (not LangChain) so we can read the
     x-portkey-cache-status response header and surface Cache: Hit in the UI.
     """
-    query = state["current_query"]
+    query = state.get("current_query", "")
+    messages = state.get("messages", [])
 
     history_str = ""
-    for msg in state["messages"][:-1]:
-        role = "User" if msg["role"] == "user" else "Assistant"
-        history_str += f"{role}: {msg['content']}\n"
+    for msg in messages[:-1]:
+        role = "User" if msg.get("role") == "user" else "Assistant"
+        history_str += f"{role}: {msg.get('content', '')}\n"
 
-    user_msg = state["messages"][-1]["content"] if state["messages"] else ""
+    user_msg = (
+        messages[-1].get("content", "")
+        if messages
+        else query
+        )
 
-    if query == "CONVERSATIONAL":
+    if state.get("route") == "conversational" or query == "CONVERSATIONAL":
         log.info("Generating conversational response using memory.")
         prompt = f"""
         You are a friendly and helpful Enterprise AI Assistant.

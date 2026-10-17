@@ -8,14 +8,14 @@ class Settings(BaseSettings):
 
     # LLM
     llm_provider: str = "deepseek"
-    deepseek_api_key: str = os.getenv("DEEPSEEK_API_KEY")
+    deepseek_api_key: str | None = None
     deepseek_base_url: str = "https://api.deepseek.com"
     deepseek_model: str = "deepseek-chat"
-    groq_api_key: str = os.getenv("GROQ_API_KEY")
+    groq_api_key: str | None = None
     groq_model: str = "openai/gpt-oss-120b"
 
     # Pinecone
-    pinecone_api_key: str = os.getenv("PINECONE_API_KEY")
+    pinecone_api_key: str | None = None
     pinecone_index_name: str = "goaguide-ai"
     pinecone_namespace: str = "goa-v1"
     embedding_model: str = "llama-text-embed-v2"
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     pinecone_region : str= "us-east-1"
 
     # Observability
-    LOGFIRE_TOKEN: str = os.getenv("LOGFIRE_TOKEN")
+    LOGFIRE_TOKEN: str | None = None
     logfire_environment: str = "development"
 
     # Web fallback
@@ -41,10 +41,10 @@ class Settings(BaseSettings):
     admin_api_key: str = "change-me"
 
     # --- LLM GATEWAY (PORTKEY) ---
-    PORTKEY_API_KEY :str= os.getenv("PORTKEY_API_KEY")
+    PORTKEY_API_KEY :str | None = None
     GROQ_SLUG :str=  "rag1"     # primary: @rag/llama-3.3-70b-versatile
     GROQ_SLUG_2:str = "rag2"
-    PORTKEY_PRIMARY_CONFIG_ID:str=os.getenv("portkey_primary_config_id")
+    PORTKEY_PRIMARY_CONFIG_ID:str | None = None
 
 
 @lru_cache

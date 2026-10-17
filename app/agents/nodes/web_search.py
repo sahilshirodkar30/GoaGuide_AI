@@ -3,14 +3,27 @@ import os
 from tavily import TavilyClient
 from app.agents.state import AgentState
 from app.logger import log
+from functools import lru_cache
 
-tavily = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
+
+@lru_cache(maxsize=1)
+def get_tavily_client() -> TavilyClient:
+    """Create the Tavily client only when web search is requested."""
+    api_key = os.getenv("TAVILY_API_KEY")
+
+    if not api_key:
+        raise RuntimeError(
+            "TAVILY_API_KEY is missing. Configure it in your .env file."
+        )
+
+    return TavilyClient(api_key=api_key)
 
 def web_search_node(state: AgentState):
     query = state["current_query"]
 
     with log.span("🌐 Tavily Web Search"):
         try:
+            tavily = get_tavily_client()
             response = tavily.search(
                 query=query,
                 search_depth="basic",     # "advanced" = better quality, 2x credits

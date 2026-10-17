@@ -7,8 +7,8 @@ from app.services.retrieval.embedding import embed_query
 # Initialize Pinecone client
 pc = Pinecone(api_key=settings.pinecone_api_key)
 
-# Connect to the existing Pinecone index
-index = pc.Index(settings.pinecone_index_name)
+def get_index():
+    return pc.Index(settings.pinecone_index_name)
 
 
 def search_enterprise_knowledge(query: str, limit: int = 8):
@@ -21,7 +21,7 @@ def search_enterprise_knowledge(query: str, limit: int = 8):
     """
     try:
         query_vector = embed_query(query)
-
+        index = get_index()
         response = index.query(
             vector=query_vector,
             top_k=limit,

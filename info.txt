@@ -32,3 +32,18 @@ run.py: uvicorn entry point.
 ui/: Streamlit or Gradio frontend, last.
 Phase 8: Evals
 evals/: build a small set of 20-30 Goa questions with expected answers. Ideally start collecting these in Phase 3, but at the latest build them before tuning anything.
+
+
+
+
+
+Step	Production file	Test file
+1	app/config.py	tests/unit/test_config.py
+2	app/ingestion/splitter.py	tests/unit/test_splitter.py
+3	app/ingestion/loaders/office.py	tests/unit/test_office_loader.py
+4	app/ingestion/processor.py	tests/unit/test_processor.py
+5	app/agents/nodes/planner.py	tests/unit/test_planner.py
+6	app/agents/nodes/retriever.py	tests/unit/test_retriever.py
+7	app/agents/nodes/responder.py	tests/unit/test_responder.py
+8	app/agents/graph.py	tests/unit/test_graph.py
+9	app/main.py	tests/api/test_main.py

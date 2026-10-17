@@ -10,7 +10,6 @@ folders = [
     "app/ingestion/chunking",
     "app/ingestion/loaders",
     "app/data",
-    "app/evals",
     "app/ui",
 ]
 

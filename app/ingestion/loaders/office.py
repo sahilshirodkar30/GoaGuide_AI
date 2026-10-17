@@ -19,5 +19,5 @@ def parse_office(file_path: str):
 
             return full_text
         except Exception as e:
-            log.error(f"❌ Office Parse Failed: {e}")
+            log.exception(f"❌ Office Parse Failed: {e}")
             raise e
