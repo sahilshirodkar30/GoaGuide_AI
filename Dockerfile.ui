@@ -8,7 +8,7 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential \
     && rm -rf /var/lib/apt/lists/*
-    
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -17,7 +17,7 @@ COPY . .
 EXPOSE 8501
 
 # Change app/ui/app.py if your Streamlit file has a different name
-CMD ["streamlit", "run", "app/ui/app.py", \
+CMD ["streamlit", "run", "app/ui/streamlit_ui.py", \
      "--server.port=8501", \
      "--server.address=0.0.0.0", \
      "--server.headless=true"]
